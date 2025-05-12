@@ -14,7 +14,11 @@ const LoginPage: React.FC = () => {
   const [step, setStep] = useState<'enterMobile' | 'enterOtp'>('enterMobile');
 
   const handleSendOtp = async () => {
-    if (!mobile) return;
+    if (!mobile.trim()) {
+      alert('Please enter a mobile number.');
+      return;
+    }
+    
     try {
       await dispatch(sendOtp(mobile)).unwrap();
       setStep('enterOtp');
@@ -24,10 +28,14 @@ const LoginPage: React.FC = () => {
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp) return;
+    if (!otp.trim()) {
+      alert('Please enter the OTP.');
+      return;
+    }
+    
     try {
       await dispatch(verifyOtp({ mobile, otp })).unwrap();
-      navigate('/create');
+      navigate('/dashboard');
     } catch (err) {
       console.error('Error verifying OTP:', err);
     }

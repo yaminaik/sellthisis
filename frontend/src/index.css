@@ -10,6 +10,18 @@
     --sis-light: #fff9f5;
     --sis-dark: #2d2042;
 
+    --diwali-start: #ffd76e;
+    --diwali-end: #e87ad0;
+  
+    --warm-start: #ff8a7b;
+    --warm-end: #9b70e3;
+  
+    --cool-start: #63ccd0;
+    --cool-end: #e87ad0;
+  
+    --classic-start: #9b70e3;
+    --classic-end: #e87ad0;
+
   }
 
   /* background colors */

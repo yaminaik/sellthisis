@@ -8,7 +8,23 @@ import Layout from "./components/Layout";
 import LoginPage from './pages/LoginPage';
 import CreateShopPage from './pages/CreateShopPage';
 import Dashboard from './pages/Dashboard';
+import AddProductPage from './pages/AddProductPage';
+import PreviewPage from './pages/PreviewPage';
+import ViewShopPage from './pages/ViewShopPage';
+
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from './redux/store';
+import { getCurrentUser } from './redux/slices/authSlice';
+import EditShopPage from './pages/EditShopPage';
+
 function App() {
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(getCurrentUser());
+  }, [dispatch]);
+
   return (
     <Router>
       <Routes>
@@ -18,6 +34,12 @@ function App() {
         <Route path="/login" element={<Layout><LoginPage /></Layout>} />
         <Route path="/create" element={<Layout><CreateShopPage /></Layout>} />
         <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
+        <Route path="/shop/:shopLink/add-product" element={<Layout><AddProductPage /></Layout>} />
+        <Route path="/shop/:shopLink/preview" element={<Layout><PreviewPage /></Layout>} />
+        <Route path="/shop/:shopLink" element={<ViewShopPage />}/>
+        <Route path="/edit-shop/:id" element={<Layout><EditShopPage /></Layout>} />
+
+
       </Routes>
     </Router>
   );

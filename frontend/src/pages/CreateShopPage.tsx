@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../redux/store';
-import { createOrUpdateShop, resetShopStatus } from '../redux/slices/shopSlice';
+import { createShop, resetShopStatus, getMyShops } from '../redux/slices/shopSlice';
 import { useNavigate } from 'react-router-dom';
 
 const CreateShopPage: React.FC = () => {
   const { seller } = useSelector((state: RootState) => state.auth);
-  const { loading, error, success } = useSelector((state: RootState) => state.shop);
+  const { loading, success, error } = useSelector((state: RootState) => state.shop);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
@@ -19,91 +19,105 @@ const CreateShopPage: React.FC = () => {
     }
   }, [seller, navigate]);
 
-  // 🛠️ Watch for success
   useEffect(() => {
     if (success) {
       dispatch(resetShopStatus());
-      navigate('/dashboard'); // 🚀 Move to dashboard only after shop saved successfully
+      dispatch(getMyShops());
+      navigate('/dashboard');
     }
   }, [success, dispatch, navigate]);
 
   const handleSubmit = async () => {
-    if (!shopName.trim()) return;
+    if (!shopName.trim()) {
+      alert('Please enter a shop name.');
+      return;
+    }
 
-    await dispatch(createOrUpdateShop({
-      sellerId: seller!.id,
-      shop: {
-        shop_name: shopName,
-        shop_link: shopName.toLowerCase().replace(/\s+/g, '-'),
-        description,
-        profile_image: null,
-      }
+    await dispatch(createShop({
+      shop_name: shopName,
+      description,
+      profile_image: null
     }));
-    // ⛔ DO NOT navigate manually here, navigate only from success watcher
   };
 
   if (!seller) return null;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-sis-light p-6">
-      <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-8">
-        <h1 className="text-3xl font-bold mb-2 text-sis-dark">Create Your Shop</h1>
-        <p className="text-sis-dark mb-6">Let's start with some basic information about your shop.</p>
-
-        <div className="mb-4">
-          <label htmlFor="shopName" className="block text-sis-dark mb-1 font-semibold">
-            Shop Name
-          </label>
-          <input
-            id="shopName"
-            type="text"
-            value={shopName}
-            onChange={(e) => setShopName(e.target.value)}
-            className="input"
-            placeholder="My Amazing Crafts"
-          />
+    <div className="flex flex-col items-center justify-center min-h-screen p-6">
+      <div className="w-full max-w-2xl bg-white rounded-3xl shadow-xl p-10 space-y-8">
+        <div className="text-center">
+          <span className="inline-block bg-sis-purple/10 text-sis-purple font-semibold text-xs px-4 py-1 rounded-full mb-4">
+            Step 1: Create Your Shop
+          </span>
+          <h1 className="text-4xl font-bold text-sis-dark mb-2">Let's Set Up Your Shop</h1>
+          <p className="text-sis-dark/70 text-base">
+            Start by telling us a little about what you're selling.
+          </p>
         </div>
 
-        <div className="mb-4">
-          <label htmlFor="description" className="block text-sis-dark mb-1 font-semibold">
-            Description
-          </label>
-          <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="input h-24"
-            placeholder="Tell customers what makes your products special..."
-          />
+        <div className="space-y-5">
+          {/* Shop Name */}
+          <div>
+            <label htmlFor="shopName" className="block text-sis-dark mb-1 font-semibold">
+              Shop Name <span className="text-sis-pink">*</span>
+            </label>
+            <input
+              id="shopName"
+              type="text"
+              value={shopName}
+              onChange={(e) => setShopName(e.target.value)}
+              className="input"
+              placeholder="My Amazing Crafts"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label htmlFor="description" className="block text-sis-dark mb-1 font-semibold">
+              Description <span className="text-sis-pink">*</span>
+            </label>
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="input h-28"
+              placeholder="Tell customers what makes your products special..."
+            />
+          </div>
+
+          {/* Phone number (readonly) */}
+          <div>
+            <label className="block text-sis-dark mb-1 font-semibold">
+              Contact (Phone or WhatsApp)
+            </label>
+            <input
+              type="text"
+              value={seller?.mobile}
+              readOnly
+              className="input bg-gray-100 cursor-not-allowed"
+            />
+          </div>
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sis-dark mb-1 font-semibold">
-            Contact Information
-          </label>
-          <input
-            type="text"
-            value={seller?.mobile}
-            readOnly
-            className="input bg-gray-100 cursor-not-allowed"
-          />
-        </div>
-
-        <div className="p-4 bg-purple-100 rounded-xl text-center text-sis-dark text-sm mb-6">
-          "Your shop name is the first thing customers will see. Choose something memorable that reflects what you sell!"
+        {/* Info box */}
+        <div className="p-4 bg-sis-light rounded-xl text-center text-sis-dark text-sm">
+          <span className="italic">
+            "Your shop name is the first thing customers will see. Pick something memorable!"
+          </span>
         </div>
 
         {error && (
-          <div className="text-red-500 text-center mb-4">{error}</div>
+          <div className="text-red-500 text-center text-sm">{error}</div>
         )}
 
-        <div className="flex justify-end">
+        {/* Button */}
+        <div className="flex justify-center pt-4">
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="btn btn-gradient-purple"
+            className="btn btn-gradient-purple w-full sm:w-auto"
           >
-            {loading ? 'Saving...' : 'Next →'}
+            {loading ? 'Saving...' : 'Continue →'}
           </button>
         </div>
       </div>
